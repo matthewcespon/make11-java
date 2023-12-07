@@ -1,8 +1,77 @@
-import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+public class make11 {
 
-public class CardTest {
-    public static void main(String[] args) {
+    public static String[][] highscoreTable() throws Exception {
+        File file = new File("src/highscores.txt");
+        Scanner fileInput = new Scanner(file);
+        String highscoreData;
+        int marker1 = 0, marker2;
+        String name, score;
+
+        // Create a two-dimensional array to store the high scores
+        String[][] highscores = new String[5][2]; // Assuming there are a maximum of 5 high scores
+
+        int index = 0; // Index for storing high scores in the array
+        while (fileInput.hasNextLine()) {
+            highscoreData = fileInput.nextLine();
+            marker2 = highscoreData.indexOf(",", marker1);
+            name = highscoreData.substring(marker1, marker2);
+            score = highscoreData.substring(marker2 + 1);
+            // Store the name and score in the array
+            highscores[index][0] = name;
+            highscores[index][1] = score;
+            index++; // Increment the index for the next high score entry
+        }
+        return highscores;
+    }
+
+    public static void printScores(String[][] highscores) {
+        System.out.println("Highscores:");
+        for (int i = 0; i < highscores.length; i++) {
+            System.out.printf("%-10s %s\n", highscores[i][0], highscores[i][1]);
+        }
+    }
+
+    public static void addScores(String[][] highscores, int nscore) throws Exception{
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter name: ");
+        String name = scanner.nextLine();
+        int score = nscore;
+        // Create a new high score entry
+        String[] newEntry = {name, String.valueOf(score)};
+        // Add the new entry to the high scores array
+        highscores[highscores.length - 1] = newEntry;
+
+        // Bubble sort the high scores array
+        for (int i = 0; i < highscores.length - 1; i++) {
+            for (int j = 0; j < highscores.length - i - 1; j++) {
+                int score1 = Integer.parseInt(highscores[j][1]);
+                int score2 = Integer.parseInt(highscores[j + 1][1]);
+                if (score1 < score2) {
+                    // Swap the positions of the high scores
+                    String[] temp = highscores[j];
+                    highscores[j] = highscores[j + 1];
+                    highscores[j + 1] = temp;
+                }
+            }
+        }
+        FileWriter fileW = new FileWriter("src/highscores.txt");
+        for (int i = 0; i < highscores.length; i++) {
+            fileW.write(highscores[i][0] + "," + highscores[i][1] + "\n");
+        }
+        fileW.close();
+    }
+
+    public static int getLowestScore(String[][] highscores) {
+        int lowestScore = Integer.parseInt(highscores[highscores.length-1][1]);// Get index of last element in array
+        return lowestScore;                                                    // Assuming it is sorted
+    }
+
+    public static void main(String[] args) throws Exception {
+        printScores(highscoreTable());
         Scanner scanner = new Scanner(System.in);
         Deck deck = new Deck();
         Card[] cardList = new Card[5];
@@ -74,6 +143,8 @@ public class CardTest {
                 System.out.println("You lose!");
                 System.out.println("Your highscore is " + highScore + ".");
                 gameOver = 1;
+                addScores(highscoreTable(), 5);
+                printScores(highscoreTable());
                 break;
             } if (deck.deckIsEmpty()) {
                 System.out.println("Deck is empty");

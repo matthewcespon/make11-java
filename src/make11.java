@@ -67,7 +67,8 @@ public class make11 {
 
     public static int getLowestScore(String[][] highscores) {
         int lowestScore = Integer.parseInt(highscores[highscores.length-1][1]);// Get index of last element in array
-        return lowestScore;                                                    // Assuming it is sorted
+        return lowestScore;  
+                                                                                // Assuming it is sorted
     }
 
     public static int getHighestScore(String[][] highscores) {

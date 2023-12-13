@@ -2,15 +2,15 @@ import java.util.Scanner;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-public class make11 {
 
+    
+public class make11 {
     public static String[][] highscoreTable() throws Exception {
         File file = new File("src/highscores.txt");
         Scanner fileInput = new Scanner(file);
         String highscoreData;
         int marker1 = 0, marker2;
         String name, score;
-
         // Create a two-dimensional array to store the high scores
         String[][] highscores = new String[5][2]; // Assuming there are a maximum of 5 high scores
 
@@ -25,6 +25,7 @@ public class make11 {
             highscores[index][1] = score;
             index++; // Increment the index for the next high score entry
         }
+        fileInput.close();
         return highscores;
     }
 
@@ -44,7 +45,6 @@ public class make11 {
         String[] newEntry = {name, String.valueOf(score)};
         // Add the new entry to the high scores array
         highscores[highscores.length - 1] = newEntry;
-
         // Bubble sort the high scores array
         for (int i = 0; i < highscores.length - 1; i++) {
             for (int j = 0; j < highscores.length - i - 1; j++) {
@@ -70,19 +70,63 @@ public class make11 {
         return lowestScore;                                                    // Assuming it is sorted
     }
 
-    public static void main(String[] args) throws Exception {
-        printScores(highscoreTable());
-        Scanner scanner = new Scanner(System.in);
-        Deck deck = new Deck();
+    public static int getHighestScore(String[][] highscores) {
+        int highestScore = Integer.parseInt(highscores[0][1]);// Get index of first element in array
+        return highestScore;                                                 
+    }
+
+    public static Card[] dealInitialCards(Deck deck) {
         Card[] cardList = new Card[5];
         for (int j = 0; j < 5; j++){ // Deal initial 5 cards
             cardList[j] = deck.deal();
         }
-        int roundCount = 0;
-        int highScore = 0;
-        int gameOver = 0;        
-        while (gameOver == 0 && deck.deal() != null) {
-            System.out.println("\nRound " + (roundCount + 1) + "\n");
+        return cardList;
+    }
+
+    public static void writeRound(Card[] cardList, Card computerCard, String userCard, int round, boolean pointScored) throws Exception{
+        FileWriter fileW = new FileWriter("src/replay.txt",true);
+        fileW.write("Round " + round + "\n");
+        fileW.write("Player's hand: " + cardList[0] + ", " + cardList[1] + ", " + cardList[2] + ", " + cardList[3] + ", " + cardList[4] + "\n");
+        fileW.write("Computer's card: " + computerCard + "\n");
+        fileW.write("Player's card: " + userCard + "\n");
+        if(pointScored){
+            fileW.write("Player scored a point\n");
+            fileW.write("\n");
+        } else {
+            fileW.write("No point scored\n");
+            fileW.write("\n");
+        }
+        fileW.close();
+    }
+
+    public static void clearReplay() throws Exception {
+        FileWriter fileW = new FileWriter("src/replay.txt");
+        fileW.write("");
+        fileW.close();
+    }
+    
+    public static void viewReplay() throws Exception {
+        File file = new File("src/replay.txt");
+        Scanner fileInput = new Scanner(file);
+        while (fileInput.hasNextLine()) {
+            System.out.println(fileInput.nextLine());
+        }
+        fileInput.close();
+    }
+
+    public static void main(String[] args) throws Exception {
+        Deck deck = new Deck();
+        printScores(highscoreTable());
+        Scanner scanner = new Scanner(System.in);
+        Card[] cardList = dealInitialCards(new Deck());
+        Highscore highscore = new Highscore();
+        RoundCount roundcount = new RoundCount();
+        boolean gameOver = false;          
+        boolean pointScored = false;
+        while (gameOver == false && deck.deal() != null) {
+            pointScored = false;
+            System.out.println("\nRound " + (roundcount.getCount() + 1));
+            System.out.println("\nCurrent score "+ highscore.getScore() + "\n");
             Card computerCard = deck.deal();
             int computerRank = computerCard.getRankValue();
             System.out.println("The computer's card is the " + computerCard + "\n");
@@ -95,69 +139,153 @@ public class make11 {
             String choice = scanner.next().toUpperCase();
 
             while (!choice.matches("[A-E]")) {
-                System.out.println("Invalid choice. Please enter an option (A-E)");
+                System.out.println("Invalid choice entered. Enter an option (A-E)");
                 choice = scanner.next().toUpperCase();
             }
             int userNumber = 0;
             int userOption = 0;
+            String userCard = "";
             switch (choice) {
                 case "A":
-                    userNumber = cardList[0].getRankValue();
                     userOption = 0;
+                    userCard = cardList[0].toString();
+                    userNumber = cardList[0].getRankValue();
                     break;
                 case "B":
-                    userNumber = cardList[1].getRankValue();
                     userOption = 1;
+                    userCard = cardList[1].toString();
+                    userNumber = cardList[1].getRankValue();
                     break;
                 case "C":
-                    userNumber = cardList[2].getRankValue();
                     userOption = 2;
+                    userCard = cardList[2].toString();
+                    userNumber = cardList[2].getRankValue();
                     break;
                 case "D":
-                    userNumber = cardList[3].getRankValue();
                     userOption = 3;
+                    userCard = cardList[3].toString();
+                    userNumber = cardList[3].getRankValue();
                     break;
                 case "E":
-                    userNumber = cardList[4].getRankValue();
                     userOption = 4;
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please enter A-E.");
+                    userCard = cardList[4].toString();
+                    userNumber = cardList[4].getRankValue();
                     break;
             }
-            
             userNumber = Math.min(userNumber, 10);
             computerRank = Math.min(computerRank, 10);
-            System.out.println();
-            System.out.println();
             if (userNumber + computerRank == 11) {
                 System.out.println("You win!");
-                highScore++;
-                roundCount++;
+                pointScored = true;
+                highscore.increment();  // Increment high score
+                roundcount.increment(); // Increment round count
+                String faceCards = ""; // String to store index of face cards
+                for (int k = 0; k < 5; k++) {
+                    if (cardList[k].toString().matches(".*[JQK].*")) { // If card is a face card
+                        if (cardList[userOption] != cardList[k]){ // If card is not the card the user chose, 
+                                                                 // prevents the initial card from being flagged if it is a face card
+                            faceCards += k; // Add index of face card to string
+                        }
+                    }
+                } 
+                if(faceCards.isEmpty() == false){
+                    System.out.println("Face card detected, do you want to swap it out? (Y/N)");
+                    String swapChoice = scanner.next().toUpperCase();;
+                    if (swapChoice.equals("Y")) {
+                        System.out.println("Which card would you like to swap out? (A-E)");
+                        String swapCard = scanner.next().toUpperCase();
+                        while (!swapCard.matches("[A-E]")) {
+                            System.out.println("Invalid choice entered. Enter an option (A-E)");
+                            swapCard = scanner.next().toUpperCase();
+                        }
+                        switch (swapCard) {
+                            case "A":
+                                if (faceCards.contains("0")) {
+                                    userCard = userCard + ", " + cardList[0].toString();
+                                    writeRound(cardList, computerCard, userCard, roundcount.getCount(), pointScored);
+                                    cardList[0] = deck.deal();
+                                } else {
+                                    System.out.println("Invalid option, game continues...");
+                                }
+                                break;
+                            case "B":
+                                if (faceCards.contains("1")) {
+                                    userCard = userCard + ", " + cardList[1].toString();
+                                    writeRound(cardList, computerCard, userCard, roundcount.getCount(), pointScored);
+                                    cardList[1] = deck.deal();
+                                } else {
+                                    System.out.println("Invalid option, game continues...");
+                                }
+                                break;
+                            case "C":
+                                if (faceCards.contains("2")) {
+                                    //write cardlist2.suit to fi
+                                    userCard = userCard + ", " + cardList[2].toString();
+                                    writeRound(cardList, computerCard, userCard, roundcount.getCount(), pointScored);
+                                    cardList[2] = deck.deal();
+                                } else {
+                                    System.out.println("Invalid option, game continues...");
+                                }
+                                break;
+                            case "D":
+                                if (faceCards.contains("3")) {
+                                    userCard = userCard + ", " + cardList[3].toString();
+                                    writeRound(cardList, computerCard, userCard, roundcount.getCount(), pointScored);
+                                    cardList[3] = deck.deal();
+                                } else {
+                                    System.out.println("Invalid option, game continues...");
+                                }
+                                break;
+                            case "E":
+                                if (faceCards.contains("4")) {
+                                    userCard = userCard + ", " + cardList[4].toString();
+                                    writeRound(cardList, computerCard, userCard, roundcount.getCount(), pointScored);
+                                    cardList[4] = deck.deal();
+                                } else {
+                                    System.out.println("Invalid option, game continues...");
+                                }
+                                break; 
+                        }
+                    }
+                }
                 cardList[userOption] = deck.deal();
             } else if (cardList[userOption].getSuit() == computerCard.getSuit()){
                 System.out.println("Matching suit! no points awarded");
-                roundCount++;
+                pointScored = false;
+                roundcount.increment();
+                writeRound(cardList, computerCard, userCard, roundcount.getCount(), pointScored);
                 cardList[userOption] = deck.deal();
-            } else {
-                System.out.println("You lose!");
-                System.out.println("Your highscore is " + highScore + ".");
-                gameOver = 1;
-                addScores(highscoreTable(), 5);
+            } else if (deck.deckIsEmpty()) {
+                System.out.println("Deck is empty game over! :(");
                 printScores(highscoreTable());
                 break;
-            } if (deck.deckIsEmpty()) {
-                System.out.println("Deck is empty");
-                break;
             }
+            else {
+                System.out.println("You lose!");
+                System.out.println("Your highscore is " + highscore.getScore() + ".");
+                gameOver = true;
+                printScores(highscoreTable());
+                pointScored = false;
+                roundcount.increment();
+                writeRound(cardList, computerCard, userCard, roundcount.getCount(), pointScored);
+            } 
         }
-        System.out.println("outside of for loop");
-        //ASK FOR REPLAY
+        if (highscore.getScore() >= getLowestScore(highscoreTable())) {
+            System.out.println("\nYou made the highscore table!");
+            addScores(highscoreTable(), highscore.getScore());
+            System.out.println("UPDATED SCORES\n");
+            printScores(highscoreTable());
+        }
+        System.out.println("\nWould you like to view the replay? (Y/N)");
+        String replayChoice = scanner.next().toUpperCase();
+        while(!replayChoice.matches("[YN]")){
+            System.out.println("Invalid choice entered. Enter an option (Y/N)");
+            replayChoice = scanner.next().toUpperCase();
+        }
+        if(replayChoice.equals("Y")){
+            viewReplay();
+        }
+        clearReplay();
     }
 }
-
-
-
-
-
 

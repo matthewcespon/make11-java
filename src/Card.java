@@ -25,9 +25,6 @@ public class Card implements Comparable<Card>{
     public int getRankValue(){
         return this.rank + 1;
     }
-    public boolean isBiggerThan(Card anotherCard){
-        return this.rank > anotherCard.rank;
-    }
 
     public String toString(){
         return getRank() + " of " + getSuit();

@@ -12,6 +12,4 @@ public class CardTest {
         int neededCard = 11 - card1;
         System.out.println(card + " + Card value of " + neededCard + " makes 11!");
     }
-
-
 }

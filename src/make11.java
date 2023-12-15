@@ -177,7 +177,6 @@ public class make11 {
                 System.out.println("You win!");
                 pointScored = true;
                 highscore.increment();  // Increment high score
-                roundcount.increment(); // Increment round count
                 String faceCards = ""; // String to store index of face cards
                 for (int k = 0; k < 5; k++) {
                     if (cardList[k].toString().matches(".*[JQK].*")) { // If card is a face card
@@ -248,11 +247,12 @@ public class make11 {
                     }
                 }
                 cardList[userOption] = deck.deal();
+                roundcount.increment(); // Increment round count
             } else if (cardList[userOption].getSuit() == computerCard.getSuit()){
                 System.out.println("Matching suit! no points awarded");
                 pointScored = false;
-                roundcount.increment();
                 writeRound(cardList, computerCard, userCard, roundcount.getCount(), pointScored);
+                roundcount.increment();
                 cardList[userOption] = deck.deal();
             } else if (deck.deckIsEmpty()) {
                 System.out.println("Deck is empty game over! :(");
@@ -265,8 +265,9 @@ public class make11 {
                 gameOver = true;
                 printScores(highscoreTable());
                 pointScored = false;
-                roundcount.increment();
+
                 writeRound(cardList, computerCard, userCard, roundcount.getCount(), pointScored);
+                roundcount.increment();
             } 
         }
         if (highscore.getScore() >= getLowestScore(highscoreTable())) {
@@ -288,4 +289,5 @@ public class make11 {
         }
         clearReplay();
     }
+    
 }

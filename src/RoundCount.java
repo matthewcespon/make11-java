@@ -2,7 +2,7 @@ public class RoundCount {
     private int count;
 
     public RoundCount() {
-        count = 0;
+        count = 1;
     }
 
     public void increment() {

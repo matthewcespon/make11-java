@@ -1,5 +1,5 @@
-john,6
-jen,5
-jack,4
-mark,4
-rocky,2
+john,1
+jen,1
+jack,1
+mark,1
+rocky,1

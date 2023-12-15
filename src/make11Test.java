@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class make11Test {
 
     @Test
-    //TEST DEALINITIALCARDS() RETURNS ARRAY OF 5
+        //TEST DEALINITIALCARDS() RETURNS ARRAY OF 5
     void testdealInitialCards() {
         Deck deck = new Deck();
         Card[] actualCards = make11.dealInitialCards(new Deck());
@@ -31,7 +31,7 @@ class make11Test {
     @Test
         //TEST GETLOWESTSCORE() GETS LOWEST SCORE FROM HIGHSCORES.TXT
     void testgetLowestScore() throws Exception {
-        assertEquals(4,make11.getLowestScore(make11.highscoreTable()));
+        assertEquals(1,make11.getLowestScore(make11.highscoreTable()));
     }
 
 

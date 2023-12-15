@@ -6,13 +6,13 @@ class RoundCountTest {
     RoundCount roundcount = new RoundCount();
     @Test
     void testInitialValue() {
-        assertEquals(0,roundcount.getCount());
+        assertEquals(1,roundcount.getCount());
     }
 
     @Test
     void testScoreAfterIncrement() {
         roundcount.increment();
-        assertEquals(1,roundcount.getCount());
+        assertEquals(2,roundcount.getCount());
     }
 
     @Test
@@ -20,6 +20,6 @@ class RoundCountTest {
         for(int i = 0; i < 5;i++){
             roundcount.increment();
         }
-        assertEquals(5,roundcount.getCount());
+        assertEquals(6,roundcount.getCount());
     }
 }

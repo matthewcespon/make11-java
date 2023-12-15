@@ -1,5 +1,5 @@
+nice,2
 john,1
 jen,1
 jack,1
 mark,1
-rocky,1

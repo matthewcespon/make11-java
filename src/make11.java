@@ -36,11 +36,9 @@ public class make11 {
         }
     }
 
-    public static void addScores(String[][] highscores, int nscore) throws Exception{
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter name: ");
-        String name = scanner.nextLine();
-        int score = nscore;
+    public static void addScores(String[][] highscores, int newScore, String newName) throws Exception{
+        int score = newScore;
+        String name = newName;
         // Create a new high score entry
         String[] newEntry = {name, String.valueOf(score)};
         // Add the new entry to the high scores array
@@ -273,7 +271,9 @@ public class make11 {
         }
         if (highscore.getScore() >= getLowestScore(highscoreTable())) {
             System.out.println("\nYou made the highscore table!");
-            addScores(highscoreTable(), highscore.getScore());
+            System.out.println("Enter name: ");
+            String name = scanner.next();
+            addScores(highscoreTable(), highscore.getScore(),name);
             System.out.println("UPDATED SCORES\n");
             printScores(highscoreTable());
         }

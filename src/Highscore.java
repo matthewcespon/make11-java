@@ -5,11 +5,9 @@ public class Highscore {
     public Highscore() {
         score = 0;
     }
-
     public void increment() {
         score++;
     }
-    
     public int getScore() {
         return score;
     }

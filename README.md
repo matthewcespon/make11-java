@@ -13,3 +13,10 @@ when a player is forced to play a card that does not Make 11 and is not of the s
 ```
 Run make11.java
 ```
+
+# Testing
+- DeckTest.java
+- CardTest.java
+- make11Test.java
+- HighscoreTest.java
+- RoundCountTest.java
